@@ -3,8 +3,8 @@
 "=============================================================================
 "
 " Author:  Takahiro SUZUKI <takahiro.suzuki.ja@gmDELETEMEail.com>
-" Version: 1.0.0 (Vim 7.1)
-" URL:     
+" Version: 1.1.0 (Vim 7.1)
+" URL:     http://www.vim.org/scripts/script.php?script_id=2761
 " Licence: GNU General Public License
 "=============================================================================
 " Document: {{{1
@@ -33,12 +33,22 @@
 "   Note that especially in case 3, 'Makefile_' is a legal template name
 "   but 'Makefile' is not even if you have no other template file.
 "
+"   New in 1.1.0 - expression expansion:
+"     String surrounded by '@{@' '@}@' in the template file is regarded as a vim
+"     expression, and will be eval()ed on loading.
+"     e.g.)
+"       @{@expand('%:t')@}@          ->  newfile.py
+"       @{@strftime('%Y-%m-%d')@}@   ->  2009-08-30
+"
 "-----------------------------------------------------------------------------
 " Installation:
 "   Place this file in /usr/share/vim/vim*/plugin or ~/.vim/plugin/
 "
 "-----------------------------------------------------------------------------
 " ChangeLog:
+"   1.1.0:
+"     - expression expansion (@{@vim-expression@}@)
+"
 "   1.0.0:
 "     - Initial release
 "
@@ -125,14 +135,18 @@ function! s:ShowList()
     endif
   endfor
 
-  let l:key = input('select template (j/k, Enter(select), q(uit):', '')
+  let l:key = input('select template (j/k, Enter(select), q(uit)):', '')
   if l:key == 'j'
     let s:sel = (s:sel+1) % s:llen
   elseif l:key == 'k'
     let s:sel = (s:llen+s:sel-1) % s:llen
   elseif l:key == ''
-    " select
-    exe '0r '.s:templatelist[s:sel]
+    " load template and eval expression in @{@..@}@
+    for line in readfile(s:templatelist[s:sel])
+      let line = substitute(line, '@{@\(.\{-1,}\)@}@', '\=eval(submatch(1))', 'g')
+      put =line
+    endfor
+    normal ggdd
     call s:Finalize()
   else
     " quit
