@@ -3,7 +3,7 @@
 "=============================================================================
 "
 " Author:  Takahiro SUZUKI <takahiro.suzuki.ja@gmDELETEMEail.com>
-" Version: 1.1.0 (Vim 7.1)
+" Version: 1.1.1 (Vim 7.1)
 " URL:     http://www.vim.org/scripts/script.php?script_id=2761
 " Licence: GNU General Public License
 "=============================================================================
@@ -46,6 +46,10 @@
 "
 "-----------------------------------------------------------------------------
 " ChangeLog:
+"   1.1.1:
+"     - up and down arrow keys as well as j/k (thanks to Steve Michalske)
+"     - quit on <Esc>
+"
 "   1.1.0:
 "     - expression expansion (@{@vim-expression@}@)
 "
@@ -81,10 +85,13 @@ function! s:Initialize()
   if s:qts_initialized == 1 | return | endif
   let s:qts_initialized = 1
   let s:save_cmdheight = &cmdheight
-  cnoremap j     <C-U>j<CR>:call <SID>ShowList()<CR>
-  cnoremap k     <C-U>k<CR>:call <SID>ShowList()<CR>
-  cnoremap q     <C-U>q<CR>
-  cnoremap <C-C> <C-U>q<CR>
+  cnoremap j      <C-U>j<CR>:call <SID>ShowList()<CR>
+  cnoremap k      <C-U>k<CR>:call <SID>ShowList()<CR>
+  cnoremap <Down> <C-U>j<CR>:call <SID>ShowList()<CR>
+  cnoremap <Up>   <C-U>k<CR>:call <SID>ShowList()<CR>
+  cnoremap q      <C-U>q<CR>
+  cnoremap <C-C>  <C-U>q<CR>
+  cnoremap <Esc>  <C-U>q<CR>
 endfunction
 
 function! s:Finalize()
@@ -93,8 +100,11 @@ function! s:Finalize()
   let &cmdheight = s:save_cmdheight
   cunmap j
   cunmap k
+  cunmap <Down>
+  cunmap <Up>
   cunmap q
   cunmap <C-C>
+  cunmap <Esc>
   set nomodified
   redraw!
 endfunction
