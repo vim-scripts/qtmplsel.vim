@@ -3,7 +3,7 @@
 "=============================================================================
 "
 " Author:  Takahiro SUZUKI <takahiro.suzuki.ja@gmDELETEMEail.com>
-" Version: 1.1.1 (Vim 7.1)
+" Version: 1.1.2 (Vim 7.3)
 " URL:     http://www.vim.org/scripts/script.php?script_id=2761
 " Licence: GNU General Public License
 "=============================================================================
@@ -46,6 +46,11 @@
 "
 "-----------------------------------------------------------------------------
 " ChangeLog:
+"   1.1.2: 
+"     - thanks to chhaas:
+"     - remove mapping of <Esc>-key since it stopps plugin from working
+"     - some beautifying
+
 "   1.1.1:
 "     - up and down arrow keys as well as j/k (thanks to Steve Michalske)
 "     - quit on <Esc>
@@ -91,7 +96,6 @@ function! s:Initialize()
   cnoremap <Up>   <C-U>k<CR>:call <SID>ShowList()<CR>
   cnoremap q      <C-U>q<CR>
   cnoremap <C-C>  <C-U>q<CR>
-  cnoremap <Esc>  <C-U>q<CR>
 endfunction
 
 function! s:Finalize()
@@ -104,7 +108,6 @@ function! s:Finalize()
   cunmap <Up>
   cunmap q
   cunmap <C-C>
-  cunmap <Esc>
   set nomodified
   redraw!
 endfunction
@@ -114,7 +117,8 @@ function! s:GlobTemplates(pat)
 endfunction
 
 function! s:LoadTemplate()
-  " enumerate
+  " 2012-06-07, chhaas: to display the selection menu imediatly:
+  enumerate
   let s:templatelist = []
     \+ s:GlobTemplates(&ft.'_*')
     \+ s:GlobTemplates('*.'.expand('%:e'))
@@ -145,7 +149,8 @@ function! s:ShowList()
     endif
   endfor
 
-  let l:key = input('select template (j/k, Enter(select), q(uit)):', '')
+  " 2012-06-07, chhaas: 
+  let l:key = input('select template (j (down) / k (up), Enter(select), q(uit)):', '')
   if l:key == 'j'
     let s:sel = (s:sel+1) % s:llen
   elseif l:key == 'k'
